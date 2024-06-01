@@ -1,0 +1,126 @@
+body {
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: 1fr auto;
+    height: 100vh;
+    font-family: 'Helvetica Neue', Arial, sans-serif; /* Updated font */
+    background-color: #f4f4f4; /* Updated background color */
+}
+
+#map {
+    grid-column: 1 / 2;
+    grid-row: 1 / 3;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background-color: #e0e0e0; /* Light background color for map container */
+}
+
+.ol-scale-bar {
+    position: absolute;
+    bottom: 50px;
+}
+
+#controls {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+    padding: 10px;
+    overflow-y: auto;
+    background-color: #ffffff; /* White background for control panel */
+    border-left: 1px solid #cccccc; /* Light gray border */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
+}
+
+.ol-tooltip {
+    position: relative;
+    background-color: white;
+    border: 1px solid #333333; /* Darker border for contrast */
+    border-radius: 3px;
+    padding: 2px 5px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #333333; /* Darker text color */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    white-space: nowrap;
+    margin-bottom: 5px;
+}
+
+    .ol-tooltip::after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-width: 5px;
+        border-style: solid;
+        border-color: white transparent transparent transparent;
+    }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #ffffff; /* White background for table */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); /* Light shadow for table */
+}
+
+table, th, td {
+    border: 1px solid #cccccc; /* Light gray border */
+}
+
+th, td {
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+    color: #333333; /* Darker text color for header */
+}
+
+#generatePdf, #toggleDraw, #clearDrawings, #searchButton {
+    margin-top: 10px;
+    width: 100%;
+    background-color: #005eb8; /* Primary blue color */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+    #generatePdf:hover, #toggleDraw:hover, #clearDrawings:hover, #searchButton:hover {
+        background-color: #004a9e; /* Darker blue on hover */
+    }
+
+#postcode, #resultSelect {
+    margin-top: 10px;
+    width: calc(100% - 20px);
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #cccccc; /* Light gray border */
+    border-radius: 5px; /* Rounded corners */
+    background-color: #ffffff; /* White background */
+}
+
+#resultSelect {
+    display: none;
+}
+
+#northArrow {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+    width: 50px;
+    height: 50px;
+}
+

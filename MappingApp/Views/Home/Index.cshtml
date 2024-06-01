@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OS Vector Tile API | OpenLayers</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/OrdnanceSurvey/os-api-branding@0.3.1/os-api-branding.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v9.1.0/ol.css" />
+    <link rel="stylesheet" href="/css/site.css" />
+</head>
+<body>
+    <div id="map">
+        <div id="northArrow">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                <polygon points="50,10 90,90 50,70 10,90" style="fill:#005eb8;stroke:white;stroke-width:2" />
+                <text x="50" y="30" font-family="Arial" font-size="24" fill="white" text-anchor="middle">N</text>
+            </svg>
+        </div>
+    </div>
+    <div id="controls">
+        <input type="text" id="postcode" placeholder="Enter postcode">
+        <button id="searchButton">Search</button>
+        <select id="resultSelect"></select>
+        <button id="toggleDraw">Start Drawing</button>
+        <button id="clearDrawings">Clear Drawings</button>
+        <button id="generatePdf">Generate PDF</button>
+        <div id="tableContainer"></div>
+        <pre id="debug"></pre>
+    </div>
+    <script src="https://cdn.jsdelivr.net/gh/OrdnanceSurvey/os-api-branding@0.3.1/os-api-branding.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ol@v9.1.0/dist/ol.js"></script>
+    <script src="https://unpkg.com/ol-mapbox-style@12.2.0/dist/olms.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.9.0/proj4.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://unpkg.com/turf/turf.min.js"></script>
+    <script src="/js/main.js"></script>
+</body>
+</html>
