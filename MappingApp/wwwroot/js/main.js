@@ -255,8 +255,14 @@
             northArrowElement.style.display = 'block';  // Ensure the North Arrow remains visible
             const mapImage = mapCanvas.toDataURL('image/png');
 
+            // Calculate the aspect ratio of the captured image
+            const mapWidth = mapContainerElement.offsetWidth;
+            const mapHeight = mapContainerElement.offsetHeight;
+            const aspectRatio = mapWidth / mapHeight;
+
+            // Define the desired width and height in the PDF
             const pdfWidth = 200; // Fixed width for the PDF
-            const pdfHeight = 150; // Fixed height for the PDF
+            const pdfHeight = pdfWidth / aspectRatio; // Calculate height based on aspect ratio
 
             doc.addImage(mapImage, 'PNG', 10, 10, pdfWidth, pdfHeight);
 

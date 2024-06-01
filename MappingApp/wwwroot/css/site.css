@@ -17,7 +17,7 @@ body {
 
 #map {
     width: 100%;
-    max-width: 800px; /* Max width for larger screens */
+    max-width: 1024px; /* Max width for larger screens */
     height: 60vh; /* Relative height to ensure it fits on mobile screens */
     position: relative;
     background-color: #e0e0e0;
