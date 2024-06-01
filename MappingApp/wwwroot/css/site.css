@@ -1,29 +1,26 @@
 body {
     margin: 0;
     padding: 0;
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    grid-template-rows: 1fr auto;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background-color: #f4f4f4;
     height: 100vh;
-    font-family: 'Helvetica Neue', Arial, sans-serif; /* Updated font */
-    background-color: #f4f4f4; /* Updated background color */
+    display: flex;
+    flex-direction: column;
 }
 
 #map-container {
-    grid-column: 1 / 2;
-    grid-row: 1 / 3;
-    width: 100%;
-    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 100%;
 }
 
 #map {
-    width: 800px; /* Fixed width */
-    height: 600px; /* Fixed height */
+    width: 100%;
+    max-width: 800px; /* Max width for larger screens */
+    height: 60vh; /* Relative height to ensure it fits on mobile screens */
     position: relative;
-    background-color: #e0e0e0; /* Light background color for map container */
+    background-color: #e0e0e0;
 }
 
 .ol-scale-bar {
@@ -32,24 +29,23 @@ body {
 }
 
 #controls {
-    grid-column: 2 / 3;
-    grid-row: 1 / 2;
     padding: 10px;
     overflow-y: auto;
-    background-color: #ffffff; /* White background for control panel */
-    border-left: 1px solid #cccccc; /* Light gray border */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Light shadow for depth */
+    background-color: #ffffff;
+    border-left: 1px solid #cccccc;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-height: 100%; /* Ensure controls don't overflow on small screens */
 }
 
 .ol-tooltip {
     position: relative;
     background-color: white;
-    border: 1px solid #333333; /* Darker border for contrast */
+    border: 1px solid #333333;
     border-radius: 3px;
     padding: 2px 5px;
     font-size: 12px;
     font-weight: bold;
-    color: #333333; /* Darker text color */
+    color: #333333;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
     white-space: nowrap;
     margin-bottom: 5px;
@@ -70,12 +66,12 @@ table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
-    background-color: #ffffff; /* White background for table */
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); /* Light shadow for table */
+    background-color: #ffffff;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 }
 
 table, th, td {
-    border: 1px solid #cccccc; /* Light gray border */
+    border: 1px solid #cccccc;
 }
 
 th, td {
@@ -85,42 +81,7 @@ th, td {
 
 th {
     background-color: #f2f2f2;
-    color: #333333; /* Darker text color for header */
-}
-
-#generatePdf, #toggleDraw, #clearDrawings, #searchButton {
-    margin-top: 10px;
-    width: 100%;
-    background-color: #005eb8; /* Primary blue color */
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 14px;
-    font-weight: bold;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-    #generatePdf:hover, #toggleDraw:hover, #clearDrawings:hover, #searchButton:hover {
-        background-color: #004a9e; /* Darker blue on hover */
-    }
-
-#postcode, #resultSelect {
-    margin-top: 10px;
-    width: calc(100% - 20px);
-    padding: 10px;
-    font-size: 14px;
-    border: 1px solid #cccccc; /* Light gray border */
-    border-radius: 5px; /* Rounded corners */
-    background-color: #ffffff; /* White background */
-}
-
-#resultSelect {
-    display: none;
+    color: #333333;
 }
 
 #northArrow {

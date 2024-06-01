@@ -53,6 +53,14 @@
                 maxZoom: 23,
                 center: [263804, 844010],
                 zoom: 2
+            }),
+            interactions: ol.interaction.defaults.defaults({
+                altShiftDragRotate: false,
+                pinchRotate: false,
+                doubleClickZoom: true,
+                dragPan: true,
+                mouseWheelZoom: true,
+                shiftDragZoom: true
             })
         });
 
@@ -121,21 +129,15 @@
             }
         }
 
-        // Function to update the table with distances and area
+        // Function to update the table with distances
         function updateTable(coordinates) {
-            let tableHtml = '<table><tr><th>Segment</th><th>Distance (m)</th></tr>';
+            let tableHtml = '<table class="table"><tr><th>Segment</th><th>Distance (m)</th></tr>';
             coordinates.forEach((coord, index) => {
                 const startLabel = String.fromCharCode(65 + index);
                 const endLabel = String.fromCharCode(65 + (index + 1) % coordinates.length);
                 const distance = calculateDistance(coord[0], coord[1], coordinates[(index + 1) % coordinates.length][0], coordinates[(index + 1) % coordinates.length][1]);
                 tableHtml += `<tr><td>${startLabel} to ${endLabel}</td><td>${distance.toFixed(1)}</td></tr>`;
             });
-
-            // Calculate area in hectares
-            const area = calculateArea(coordinates);
-            const areaHectares = area / 10000;
-            tableHtml += `<tr><td>Area</td><td>${areaHectares.toFixed(2)} ha</td></tr>`;
-
             tableHtml += '</table>';
             document.getElementById('tableContainer').innerHTML = tableHtml;
         }
@@ -253,11 +255,8 @@
             northArrowElement.style.display = 'block';  // Ensure the North Arrow remains visible
             const mapImage = mapCanvas.toDataURL('image/png');
 
-            const mapWidth = mapContainerElement.offsetWidth;
-            const mapHeight = mapContainerElement.offsetHeight;
-            const aspectRatio = mapWidth / mapHeight;
-            const pdfWidth = (doc.internal.pageSize.getWidth() * 2) / 3;
-            const pdfHeight = pdfWidth / aspectRatio;
+            const pdfWidth = 200; // Fixed width for the PDF
+            const pdfHeight = 150; // Fixed height for the PDF
 
             doc.addImage(mapImage, 'PNG', 10, 10, pdfWidth, pdfHeight);
 
@@ -279,7 +278,6 @@
 
             const features = drawSource.getFeatures();
             let centerX = 0, centerY = 0;
-            let totalArea = 0;
             features.forEach((feature) => {
                 const coordinates = feature.getGeometry().getCoordinates()[0];
                 const uniqueCoordinates = coordinates.slice(0, -1); // Remove the duplicate first point at the end
@@ -299,7 +297,6 @@
 
                 centerX /= uniqueCoordinates.length;
                 centerY /= uniqueCoordinates.length;
-                totalArea += calculateArea(uniqueCoordinates);
                 const mapScale = calculateScale(map, pdfWidth);
 
                 doc.setFontSize(10);
@@ -323,19 +320,20 @@
                 doc.rect(tableStartX - 2, tableY - 6, 38, cellHeight);
                 doc.rect(tableColumn2 - 2, tableY - 6, 38, cellHeight);
                 tableY += cellHeight;
-            });
 
-            // Add area row to the PDF table
-            const areaHectares = totalArea / 10000;
-            doc.setFontSize(10);
-            doc.setFont('helvetica', 'bold');
-            doc.setFillColor(200, 200, 200);
-            doc.rect(tableStartX - 2, tableY - 6, 38, cellHeight, 'F');
-            doc.text('Area', tableStartX, tableY);
-            doc.text(`${areaHectares.toFixed(2)} ha`, tableColumn2, tableY);
-            doc.rect(tableStartX - 2, tableY - 6, 38, cellHeight);
-            doc.rect(tableColumn2 - 2, tableY - 6, 38, cellHeight);
-            tableY += cellHeight;
+                // Calculate and add the area of the polygon in hectares
+                const polygon = new ol.geom.Polygon([uniqueCoordinates]);
+                const area = polygon.getArea() / 10000; // Convert square meters to hectares
+                doc.setFontSize(10);
+                doc.setFont('helvetica', 'bold');
+                doc.setFillColor(200, 200, 200);
+                doc.rect(tableStartX - 2, tableY - 6, 38, cellHeight, 'F');
+                doc.text('Area (ha)', tableStartX, tableY);
+                doc.text(`${area.toFixed(2)}`, tableColumn2, tableY);
+                doc.rect(tableStartX - 2, tableY - 6, 38, cellHeight);
+                doc.rect(tableColumn2 - 2, tableY - 6, 38, cellHeight);
+                tableY += cellHeight;
+            });
 
             const pdfBlob = doc.output('blob');
             const downloadLink = document.createElement('a');
@@ -347,13 +345,51 @@
             document.body.removeChild(downloadLink);
         });
 
-        function calculateDistance(x1, y1, x2, y2) {
-            return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+        document.getElementById('downloadShapefile').addEventListener('click', async () => {
+            const features = drawSource.getFeatures();
+
+            if (features.length === 0) {
+                alert('No polygons to export');
+                return;
+            }
+
+            const geojson = new ol.format.GeoJSON().writeFeaturesObject(features, {
+                featureProjection: map.getView().getProjection(),
+                dataProjection: 'EPSG:27700' // Shapefiles usually use WGS84 (EPSG:4326)
+            });
+
+            // Convert GeoJSON to shapefile
+            const shapefileBlob = await convertGeoJSONToShapefile(geojson);
+            const downloadLink = document.createElement('a');
+            downloadLink.href = URL.createObjectURL(shapefileBlob);
+            downloadLink.download = 'polygons.zip';
+            downloadLink.style.display = 'none';
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        });
+
+        async function convertGeoJSONToShapefile(geojson) {
+            return new Promise((resolve, reject) => {
+                try {
+                    const options = {
+                        folder: 'shapefile',
+                        types: {
+                            point: 'points',
+                            polygon: 'polygons',
+                            line: 'lines'
+                        }
+                    };
+                    shpwrite.download(geojson, options);
+                    resolve();
+                } catch (error) {
+                    reject(error);
+                }
+            });
         }
 
-        function calculateArea(coordinates) {
-            const polygon = new ol.geom.Polygon([coordinates]);
-            return ol.sphere.getArea(polygon);
+        function calculateDistance(x1, y1, x2, y2) {
+            return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
         }
 
         function calculateScale(map, pdfWidthMM) {
@@ -362,9 +398,7 @@
             const bottomRight = [bounds[2], bounds[1]];
             const distanceMeters = calculateDistance(bottomLeft[0], bottomLeft[1], bottomRight[0], bottomRight[1]);
 
-            const mapWidthOnScreenMM = map.getSize()[0] / 3.779528; // Pixels to mm conversion
-            const scaleScreen = (distanceMeters / mapWidthOnScreenMM)*1000;
-            const scalePdf = (distanceMeters / pdfWidthMM)*1000;
+            const scalePdf = (distanceMeters / pdfWidthMM) * 1000;
 
             return Math.round(scalePdf);
         }
@@ -377,8 +411,8 @@
             const distanceMeters = calculateDistance(bottomLeft[0], bottomLeft[1], bottomRight[0], bottomRight[1]);
 
             const mapWidthOnScreenMM = map.getSize()[0] / 3.779528; // Pixels to mm conversion
-            const scaleScreen = (distanceMeters / mapWidthOnScreenMM)*1000;
-            const scalePdf = (distanceMeters / pdfWidthMM)*1000;
+            const scaleScreen = (distanceMeters / mapWidthOnScreenMM) * 1000;
+            const scalePdf = (distanceMeters / pdfWidthMM) * 1000;
 
             document.getElementById('debug').innerHTML = `
                 Bounds: ${bounds.join(', ')}\n
