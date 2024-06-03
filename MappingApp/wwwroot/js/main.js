@@ -1,5 +1,5 @@
-﻿document.addEventListener('DOMContentLoaded', () => {
-    const apiKey = 'yoksxCkgnVyw76BK6gJ1ZGfZSi6ciZhP';
+﻿document.addEventListener('DOMContentLoaded', async () => {
+    const apiKey = await fetch('/api/Api/apiKey').then(response => response.json()).then(data => data.apiKey);
     const serviceUrl = 'https://api.os.uk/maps/vector/v1/vts';
     const placesUrl = 'https://api.os.uk/search/places/v1/postcode';
 
@@ -71,6 +71,34 @@
         });
         map.addControl(scaleLineControl);
 
+        // Add reference layer
+        fetch('https://rtificial.github.io/Mapping/ReferenceLayer.geojson')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const vectorSource = new ol.source.Vector({
+                    features: new ol.format.GeoJSON().readFeatures(data, {
+                        featureProjection: 'EPSG:27700'
+                    })
+                });
+
+                const vectorLayer = new ol.layer.Vector({
+                    source: vectorSource,
+                    visible: false // Set initial visibility to false
+                });
+
+                map.addLayer(vectorLayer);
+
+                document.getElementById('toggleLayer').addEventListener('click', () => {
+                    vectorLayer.setVisible(!vectorLayer.getVisible());
+                });
+            })
+            .catch(error => console.error('Error loading GeoJSON:', error));
+
         const drawSource = new ol.source.Vector({ wrapX: false });
         const drawLayer = new ol.layer.Vector({
             source: drawSource
@@ -96,6 +124,8 @@
 
         const modify = new ol.interaction.Modify({ source: drawSource });
         map.addInteraction(modify);
+
+
 
         // Function to create a tooltip overlay
         function createTooltip(coordinate, text, className = 'ol-tooltip ol-tooltip-measure') {
@@ -439,5 +469,6 @@
         map.on('moveend', () => {
             debugScaleCalculation(map, 198.0); // Adjust the PDF width if necessary
         });
+
     })();
 });
